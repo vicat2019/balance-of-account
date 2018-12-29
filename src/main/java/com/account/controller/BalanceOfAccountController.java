@@ -1,5 +1,7 @@
 package com.account.controller;
 
+import com.account.dao.source1.UserInfoOneMapper;
+import com.account.entity.UserInfo;
 import com.account.entity.base.ResultData;
 import com.account.service.BalanceOfAccountService;
 import com.account.service.RpTradePaymentQueryService;
@@ -10,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @program: balance-of-account
@@ -27,6 +31,9 @@ public class BalanceOfAccountController {
 
     @Autowired
     private RpTradePaymentQueryService rpTradePaymentQueryService;
+
+    @Autowired
+    private UserInfoOneMapper userInfoOneMapper;
 
 
     @RequestMapping("/")
@@ -52,6 +59,14 @@ public class BalanceOfAccountController {
         modelMap.addAttribute("fileRemainCount", 152);
         modelMap.addAttribute("platformRemainCount", 11);
 
+        Example example = new Example(UserInfo.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andLessThan("age", 20);
+
+
+        List<UserInfo> userList = userInfoOneMapper.selectByExample(example);;
+
+        modelMap.addAttribute("users", userList);
         return "result";
     }
 
