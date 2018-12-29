@@ -1,4 +1,4 @@
-package com.account.dao;
+package com.account.dao.base;
 
 
 import com.account.entity.RpTradePaymentRecord;

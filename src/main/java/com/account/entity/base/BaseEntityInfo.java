@@ -2,6 +2,7 @@ package com.account.entity.base;
 
 import org.thymeleaf.util.StringUtils;
 
+import javax.persistence.Column;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -16,8 +17,11 @@ public class BaseEntityInfo implements Serializable {
     protected String status;
     // 版本号
     protected int version;
+
     // 修改时间
+    @Column(name = "edit_time")
     protected Date modifyTime;
+
     // 创建时间
     protected Date createTime;
 

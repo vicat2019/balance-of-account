@@ -13,7 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
  **/
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.account"})
-@MapperScan("com.account.dao")
+@MapperScan("com.account.dao.base")
 public class BoaApplication {
     public static void main(String[] args) {
         SpringApplication.run(BoaApplication.class, args);

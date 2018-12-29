@@ -1,6 +1,6 @@
 package com.account.service.impl;
 
-import com.account.dao.RpTradePaymentRecordMapper;
+import com.account.dao.base.RpTradePaymentRecordMapper;
 import com.account.entity.RpTradePaymentRecord;
 import com.account.service.BaseService;
 import com.account.service.RpTradePaymentQueryService;

@@ -1,7 +1,8 @@
-package com.account.dao;
+package com.account.dao.base;
 
 import com.account.entity.AccountDataInfo;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * @author: Vincent
  * @create: 2018-12-27 18:20
  **/
+@Component
 public interface AccountDataInfoMapper {
 
     int insertBatch(@Param("list") List<AccountDataInfo> dataList);

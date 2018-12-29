@@ -147,6 +147,13 @@ public class AccountDataInfo extends BaseEntityInfo {
         }
     }
 
+    public String getRealOrderNo() {
+        if (this.orderCode.contains("-")) {
+            return orderCode.substring(0, orderCode.lastIndexOf("-"));
+        }
+        return this.orderCode;
+    }
+
     @Override
     public String toString() {
         return "AccountDataInfo{" +

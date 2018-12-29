@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.account.dao.AccountDataInfoMapper">
+<mapper namespace="com.account.dao.base.AccountDataInfoMapper">
     <resultMap id="BaseResultMap" type="com.account.entity.AccountDataInfo">
         <id column="id" jdbcType="INTEGER" property="id"/>
 
@@ -29,7 +29,7 @@
 
 
         <result column="version" jdbcType="INTEGER" property="version"/>
-        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+        <result column="edit_time" jdbcType="TIMESTAMP" property="modifyTime"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
 
     </resultMap>
@@ -49,7 +49,7 @@
     <sql id="Base_Column_List">
         id, serial_num, accounting_time, alipay_trade_no, alipay_tx_no, merchant_order_no, financial_type, income,
         expenditure, balance, service_charge, payment_channel, signed_products, payer_account, payer_name, bank_order_code,
-        product_name, order_code, remark, source_file_name, version, modify_time, create_time
+        product_name, order_code, remark, source_file_name, version, edit_time, create_time
       </sql>
 
 
@@ -109,7 +109,7 @@
             #{item.sourceFileName, jdbcType=VARCHAR}
             )
         </foreach>
-        ON DUPLICATE KEY UPDATE source_file_name=VALUES(source_file_name), modify_time=now(), version=version+1;
+        ON DUPLICATE KEY UPDATE source_file_name=VALUES(source_file_name), edit_time=now(), version=version+1;
     </insert>
 
     <insert id="insertBatchMismatch" parameterType="list">
@@ -139,7 +139,7 @@
             #{item.sourceFileName, jdbcType=VARCHAR}
             )
         </foreach>
-        ON DUPLICATE KEY UPDATE source_file_name=VALUES(source_file_name), modify_time=now(), version=version+1;
+        ON DUPLICATE KEY UPDATE source_file_name=VALUES(source_file_name), edit_time=now(), version=version+1;
     </insert>
     
     

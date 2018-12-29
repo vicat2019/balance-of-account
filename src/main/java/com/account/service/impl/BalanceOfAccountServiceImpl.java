@@ -1,6 +1,6 @@
 package com.account.service.impl;
 
-import com.account.dao.AccountDataInfoMapper;
+import com.account.dao.base.AccountDataInfoMapper;
 import com.account.entity.AccountDataInfo;
 import com.account.entity.RpTradePaymentRecord;
 import com.account.entity.base.ResultData;
@@ -90,6 +90,7 @@ public class BalanceOfAccountServiceImpl extends BaseService<AccountDataInfoMapp
         billDateList.forEach(billDate -> {
             // 查询平台中某交易日的订单银行编号
             Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("status", "SUCCESS");
             paramMap.put("billDate", billDate);
             List<String> platformNoList = rpTradePaymentQueryService.listBandOrderNoByColumn(paramMap);
 
@@ -97,14 +98,20 @@ public class BalanceOfAccountServiceImpl extends BaseService<AccountDataInfoMapp
             List<AccountDataInfo> accountDataList = mapper.queryByDate(billDate);
             List<String> accountNoList = new ArrayList<>();
             if (accountDataList != null && accountDataList.size() > 0) {
-                accountDataList.forEach(item -> accountNoList.add(item.getOrderCode()));
+                accountDataList.forEach(item -> {
+                    if (item.getOrderCode().contains("-")) {
+                        accountNoList.add(item.getRealOrderNo());
+                    } else {
+                        accountNoList.add(item.getOrderCode());
+                    }
+                });
             } else {
                 accountDataList = new ArrayList<>();
             }
 
             // 以支付宝账单为准
             List<AccountDataInfo> baseOnFileList = accountDataList.stream().filter(accountDataInfo ->
-                    !platformNoList.contains(accountDataInfo.getOrderCode())
+                    !platformNoList.contains(accountDataInfo.getOrderCode()) && !platformNoList.contains(accountDataInfo.getRealOrderNo())
             ).collect(Collectors.toList());
             if (baseOnFileList.size() > 0) {
                 mapper.insertBatchMismatch(baseOnFileList);

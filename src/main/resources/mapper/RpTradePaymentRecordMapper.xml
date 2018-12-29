@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.account.dao.RpTradePaymentRecordMapper">
+<mapper namespace="com.account.dao.base.RpTradePaymentRecordMapper">
 
     <resultMap id="BaseResultMap" type="com.account.entity.RpTradePaymentRecord">
         <id column="id" property="id" jdbcType="BIGINT"/>
