@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.account.dao.base.RpTradePaymentRecordMapper">
+<mapper namespace="com.account.dao.other.TradePaymentRecordMapper">
 
     <resultMap id="BaseResultMap" type="com.account.entity.RpTradePaymentRecord">
         <id column="id" property="id" jdbcType="BIGINT"/>
@@ -96,67 +96,156 @@
 	</sql>
 
 
-    <!-- 保存对账结果 -->
-    <insert id="insertBatchMismatch" parameterType="list">
-        insert into t_platform_mismatch (id, version, create_time,
-        status,
-        edit_time, product_name, merchant_order_no,
-        trx_no, bank_order_no, bank_trx_no,
-        merchant_name, merchant_no, payer_user_no,
-        payer_name, payer_pay_amount, payer_fee,
-        payer_account_type, receiver_user_no, receiver_name,
-        receiver_pay_amount, receiver_fee, receiver_account_type,
-        order_ip, order_referer_url, order_amount,
-        plat_income, fee_rate, plat_cost,
-        plat_profit, return_url, notify_url,
-        pay_way_code, pay_way_name, pay_success_time,
-        complete_time, is_refund, refund_times,
-        success_refund_amount, trx_type, order_from,
-        pay_type_code, pay_type_name,bank_channel_code, bank_channel_name,
-        fund_into_type,
-        remark, bank_return_msg , field1,
-        field2,
-        field3, field4, field5,
-        sett_type, sett_status,sett_merchant_no ,sett_request_no ,bank_way_code , bank_way_name ,bank_code , bank_name,
-        recon_status, recon_time,bank_result_order_no, stage_num,payer_mch_id,channel_merchant_no,
-        tm_work_id,open_card_id,plat_merchant_code,tm_order_type,channel_type_id,request_result_msg
-        )
-        values
-        <foreach collection="list" item="item" separator=",">
-            (
-            #{item.id,jdbcType=BIGINT}, #{item.version,jdbcType=SMALLINT}, #{item.createTime,jdbcType=TIMESTAMP},
-            #{item.status,jdbcType=VARCHAR},
-            #{item.modifyTime,jdbcType=TIMESTAMP}, #{item.productName,jdbcType=VARCHAR}, #{item.merchantOrderNo,jdbcType=VARCHAR},
-            #{item.trxNo,jdbcType=CHAR}, #{item.bankOrderNo,jdbcType=CHAR}, #{item.bankTrxNo,jdbcType=VARCHAR},
-            #{item.merchantName,jdbcType=VARCHAR}, #{item.merchantNo,jdbcType=VARCHAR}, #{item.payerUserNo,jdbcType=VARCHAR},
-            #{item.payerName,jdbcType=VARCHAR},
-            #{item.payerPayAmount,jdbcType=DECIMAL}, #{item.payerFee,jdbcType=DECIMAL},
-            #{item.payerAccountType,jdbcType=VARCHAR}, #{item.receiverUserNo,jdbcType=VARCHAR},
-            #{item.receiverName,jdbcType=VARCHAR},
-            #{item.receiverPayAmount,jdbcType=DECIMAL}, #{item.receiverFee,jdbcType=DECIMAL},
-            #{item.receiverAccountType,jdbcType=VARCHAR},
-            #{item.orderIp,jdbcType=VARCHAR}, #{item.orderRefererUrl,jdbcType=VARCHAR}, #{item.orderAmount,jdbcType=DECIMAL},
-            #{item.platIncome,jdbcType=DECIMAL}, #{item.feeRate,jdbcType=DECIMAL}, #{item.platCost,jdbcType=DECIMAL},
-            #{item.platProfit,jdbcType=DECIMAL}, #{item.returnUrl,jdbcType=VARCHAR}, #{item.notifyUrl,jdbcType=VARCHAR},
-            #{item.payWayCode,jdbcType=VARCHAR}, #{item.payWayName,jdbcType=VARCHAR}, #{item.paySuccessTime,jdbcType=TIMESTAMP},
-            #{item.completeTime,jdbcType=TIMESTAMP},
-            #{item.isRefund,jdbcType=VARCHAR}, #{item.refundTimes,jdbcType=SMALLINT},
-            #{item.successRefundAmount,jdbcType=DECIMAL}, #{item.trxType,jdbcType=VARCHAR},
-            #{item.orderFrom,jdbcType=VARCHAR},
-            #{item.payTypeCode,jdbcType=VARCHAR}, #{item.payTypeName,jdbcType=VARCHAR}, #{item.bankChannelCode,jdbcType=VARCHAR},
-            #{item.bankChannelName,jdbcType=VARCHAR},#{item.fundIntoType,jdbcType=VARCHAR},
-            #{item.remark,jdbcType=VARCHAR},#{item.bankReturnMsg,jdbcType=VARCHAR}, #{item.field1,jdbcType=VARCHAR},
-            #{item.field2,jdbcType=VARCHAR},
-            #{item.field3,jdbcType=VARCHAR}, #{item.field4,jdbcType=VARCHAR}, #{item.field5,jdbcType=VARCHAR},
-            #{item.settType,jdbcType=VARCHAR},#{item.settStatus,jdbcType=VARCHAR},#{item.settMerchantNo,jdbcType=VARCHAR},#{item.settRequestNo,jdbcType=VARCHAR},
-            #{item.bankWayCode,jdbcType=VARCHAR},#{item.bankWayName,jdbcType=VARCHAR},#{item.bankCode,jdbcType=VARCHAR},#{item.bankName,jdbcType=VARCHAR},
-            #{item.reconStatus,jdbcType=VARCHAR}, #{item.reconTime,jdbcType=TIMESTAMP}, #{item.bankResultOrderNo,jdbcType=TIMESTAMP},
-            #{item.stageNum,jdbcType=SMALLINT},#{item.payerMchId,jdbcType=VARCHAR},#{item.channelMerchantNo,jdbcType=VARCHAR},
-            #{item.tmWorkId,jdbcType=VARCHAR},#{item.openCardId,jdbcType=VARCHAR},#{item.platMerchantCode,jdbcType=VARCHAR},#{item.tmOrderType,jdbcType=VARCHAR},
-            #{item.channelTypeId,jdbcType=INTEGER},#{item.requestResultMsg,jdbcType=VARCHAR}
+    <!-- 对账查询条件 -->
+    <sql id="condition_sql">
+        1=1
+        <!-- billDate 的格式：2016-05-20 -->
+        <if test="billDate != null and billDate != ''">
+            and create_time between #{billDate} AND CONCAT(#{billDate},' 23:59:59')
+        </if>
+        <if test="interfaceCode != null and interfaceCode != ''">
+            and pay_way_code = #{interfaceCode}
+        </if>
+        <if test="bankOrderNo != null and bankOrderNo != ''">
+            and bank_order_no = #{bankOrderNo}
+        </if>
+
+        <if test="settRequestNo != null and settRequestNo != ''">
+            and sett_request_no = #{settRequestNo}
+        </if>
+        <if test="trxNo != null and trxNo != ''">and trx_no = #{trxNo}</if>
+        <if test="trxType != null and trxType != ''">and trx_type = #{trxType}</if>
+        <if test="merchantNo != null and merchantNo != ''">and merchant_no = #{merchantNo,jdbcType=VARCHAR}</if>
+        <if test="settMerchantNo != null and settMerchantNo != ''">and sett_merchant_no =
+            #{settMerchantNo,jdbcType=VARCHAR}
+        </if>
+        <if test="merchantOrderNo != null and merchantOrderNo != ''">and merchant_order_no =
+            #{merchantOrderNo,jdbcType=VARCHAR}
+        </if>
+        <if test="merchantName != null and merchantName != '' ">and merchant_name = #{merchantName,jdbcType=VARCHAR}
+        </if>
+        <if test="fundIntoType != null and fundIntoType != '' ">and fund_into_type = #{fundIntoType,jdbcType=VARCHAR}
+        </if>
+        <if test="payTypeName != null and payTypeName != '' ">and pay_type_name = #{payTypeName,jdbcType=VARCHAR}</if>
+        <if test="payWayName != null and payWayName != '' ">and pay_way_name = #{payWayName,jdbcType=VARCHAR}</if>
+        <if test="payWayCode != null and payWayCode != '' ">and pay_way_code = #{payWayCode,jdbcType=VARCHAR}</if>
+        <if test="bankChannelCode != null and bankChannelCode != '' ">and bank_channel_code =
+            #{bankChannelCode,jdbcType=VARCHAR}
+        </if>
+        <if test="status != null and status != '' ">and status = #{status,jdbcType=VARCHAR}</if>
+        <if test="field2 != null and field2 != '' ">and field2 like CONCAT('%' ,CONCAT(#{field2},'%'))</if>
+        <if test="field3 != null and field3 != '' ">and field3 = #{field3,jdbcType=VARCHAR}</if>
+        <if test="field4 != null and field4 != '' ">and field4 = #{field4,jdbcType=VARCHAR}</if>
+        <if test="field4 != null and field4 != '' ">and field4 = #{field4,jdbcType=VARCHAR}</if>
+        <if test="bankResultOrderNo != null and bankResultOrderNo != '' ">and bank_result_order_no =
+            #{bankResultOrderNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="statusList != null">and status in(
+            <foreach collection="statusList" item="item" index="index" separator=",">
+                #{item}
+            </foreach>
             )
+        </if>
+
+        <if test="settRequestNo != null and settRequestNo != '' ">and sett_request_no =
+            #{settRequestNo,jdbcType=VARCHAR}
+        </if>
+        <if test="bankWayCode != null and bankWayCode != '' ">and bank_way_code = #{bankWayCode,jdbcType=VARCHAR}</if>
+        <if test="bankCode != null and bankCode != '' ">and bank_code = #{bankCode,jdbcType=VARCHAR}</if>
+        <if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+            and create_time between #{beginDate} AND CONCAT(#{endDate},' 23:59:59')
+        </if>
+
+        <if test="orderDateBegin != null and orderDateBegin != '' and orderDateEnd != null and orderDateEnd != ''">
+            and create_time between #{orderDateBegin,jdbcType=VARCHAR} and #{orderDateEnd,jdbcType=VARCHAR}
+        </if>
+
+        <if test="payTimeBegin != null and payTimeBegin != '' and payTimeEnd != null and payTimeEnd != ''">
+            and pay_success_time between #{payTimeBegin} AND #{payTimeEnd}
+        </if>
+
+        <if test="moreStatus != null and moreStatus != '' ">and status in ("SUCCESS","FINISH")</if>
+        <if test="reconStatus != null and reconStatus != '' ">and recon_status = #{reconStatus,jdbcType=VARCHAR}</if>
+        <if test="reconBeginDate != null and reconBeginDate != '' and reconEndDate != null and reconEndDate != ''">
+            and recon_time between #{reconBeginDate} AND CONCAT(#{reconEndDate},' 23:59:59')
+        </if>
+        <if test="reconBillDate != null and reconBillDate != ''">
+            and recon_time between #{reconBillDate} AND CONCAT(#{reconBillDate},' 23:59:59')
+        </if>
+
+        <if test="channelMerchantNo != null and channelMerchantNo != ''">
+            and channel_merchant_no = #{channelMerchantNo,jdbcType=VARCHAR}
+        </if>
+
+        <!-- 是否需要根据createTime排序 -->
+        <if test="orderByCreteTime != null and orderByCreteTime != '' ">order by create_time desc limit 0 ,1</if>
+
+        <!-- 是否行锁，要放在查询条件最后 -->
+        <if test="isPessimist != null and isPessimist == true ">for update</if>
+
+        <if test="tmWorkId != null and tmWorkId != ''">and tm_work_id = #{tmWorkId,jdbcType=VARCHAR}</if>
+
+        <if test="openCardId != null and openCardId != ''">and open_card_id = #{openCardId,jdbcType=VARCHAR}</if>
+
+        <if test="platMerchantCode != null and platMerchantCode != ''">and plat_merchant_code =
+            #{platMerchantCode,jdbcType=VARCHAR}
+        </if>
+
+        <!-- 判断是否是地推管理员 -->
+        <if test=' groundPushAdmin == "true" '>
+            AND (USER_NO != '' OR CHANNEL_TYPE_ID != '')
+        </if>
+
+        <!-- 商户号所属用户 -->
+        <if test="userNo != null and userNo != ''">AND USER_NO = #{userNo,jdbcType=VARCHAR}</if>
+
+        <!-- 根据商户号名称进行模糊查询 -->
+        <if test="channelMerchantName != null and channelMerchantName != ''">AND CHANNEL_MERCHANT_NAME LIKE CONCAT('%'
+            ,CONCAT(#{channelMerchantName},'%'))
+        </if>
+
+        <!-- 根据商户名称进行模糊查询 -->
+        <if test="merchantName != null and merchantName != ''">AND MERCHANT_NAME LIKE CONCAT('%'
+            ,CONCAT(#{merchantName},'%'))
+        </if>
+
+        <!-- 商户号所属类型-->
+        <if test="channelTypeId != null and channelTypeId != ''">AND LOCATE(CHANNEL_TYPE_ID,
+            #{channelTypeId,jdbcType=INTEGER})
+        </if>
+
+    </sql>
+
+    <!-- 对账查询 -->
+    <select id="listByColumn" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        rp_trade_payment_record
+        <where>
+            <include refid="condition_sql"/>
+        </where>
+    </select>
+
+    <!-- 对账查询 -->
+    <select id="listBandOrderNoByColumn" parameterType="java.util.Map" resultType="java.lang.String">
+        select bank_order_no from rp_trade_payment_record
+        <where>
+            <include refid="condition_sql"/>
+        </where>
+    </select>
+
+    <!-- 根据订单号批量查询记录 -->
+    <select id="queryByBankOrderNo" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from rp_trade_payment_record
+        where bank_order_no in
+        <foreach collection="list" item="item" separator="," close=")" open="(">
+            #{item}
         </foreach>
-        ON DUPLICATE KEY UPDATE edit_time=now(), version=version+1;
-    </insert>
+
+    </select>
 
 </mapper>

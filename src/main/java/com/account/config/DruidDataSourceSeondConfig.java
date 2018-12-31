@@ -132,7 +132,7 @@ public class DruidDataSourceSeondConfig extends DataSourceProperties {
      *
      * @return
      */
-    @Bean(name = "otherTransationManager")
+    @Bean(name = "otherTransactionManager")
     public DataSourceTransactionManager setTransactionManager() {
         // 传入 dataSource
         return new DataSourceTransactionManager(setDataSource());
@@ -148,7 +148,7 @@ public class DruidDataSourceSeondConfig extends DataSourceProperties {
     public SqlSessionFactory setSqlSessionFactory() throws Exception {
         final SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(setDataSource());
-        // 设置mapper.xml 扫描路径
+        // 设置MAPPER.xml 扫描路径
         bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(DruidDataSourceSeondConfig.MAPPER_XML_AREA));
         return bean.getObject();
     }

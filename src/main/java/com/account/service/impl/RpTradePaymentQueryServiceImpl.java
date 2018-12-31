@@ -1,11 +1,13 @@
 package com.account.service.impl;
 
 import com.account.dao.base.RpTradePaymentRecordMapper;
+import com.account.dao.other.TradePaymentRecordMapper;
 import com.account.entity.RpTradePaymentRecord;
 import com.account.service.BaseService;
 import com.account.service.RpTradePaymentQueryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +19,9 @@ public class RpTradePaymentQueryServiceImpl extends BaseService<RpTradePaymentRe
         implements RpTradePaymentQueryService {
     private Logger log = LoggerFactory.getLogger("RpTradePaymentQueryServiceImpl");
 
+    @Autowired
+    private TradePaymentRecordMapper tradePaymentRecordMapper;
+
 
     /**
      * 根据参数查询交易记录List
@@ -26,12 +31,12 @@ public class RpTradePaymentQueryServiceImpl extends BaseService<RpTradePaymentRe
      */
     public List<RpTradePaymentRecord> listPaymentRecord(Map<String, Object> paramMap) {
         log.info("查询支付交易记录，参数=" + paramMap.toString());
-        return mapper.listByColumn(paramMap);
+        return tradePaymentRecordMapper.listByColumn(paramMap);
     }
 
     public List<String> listBandOrderNoByColumn(Map<String, Object> paramMap) {
         log.info("查询支付交易记录，参数=" + paramMap.toString());
-        return mapper.listBandOrderNoByColumn(paramMap);
+        return tradePaymentRecordMapper.listBandOrderNoByColumn(paramMap);
     }
 
     @Override
@@ -42,6 +47,6 @@ public class RpTradePaymentQueryServiceImpl extends BaseService<RpTradePaymentRe
 
     @Override
     public List<RpTradePaymentRecord> queryByBankOrderNo(List<String> bankOrderNoList) {
-        return mapper.queryByBankOrderNo(bankOrderNoList);
+        return tradePaymentRecordMapper.queryByBankOrderNo(bankOrderNoList);
     }
 }

@@ -134,7 +134,7 @@ public class DruidDataSourceConfig extends DataSourceProperties {
      *
      * @return
      */
-    @Bean(name = "baseTransationManager")
+    @Bean(name = "baseTransactionManager")
     @Primary
     public DataSourceTransactionManager setTransactionManager() {
         // 传入 dataSource

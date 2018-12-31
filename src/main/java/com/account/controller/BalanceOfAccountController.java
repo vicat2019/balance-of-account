@@ -1,6 +1,7 @@
 package com.account.controller;
 
 import com.account.dao.base.AccountDataInfoMapper;
+import com.account.dao.other.TradePaymentRecordMapper;
 import com.account.dao.other.UserInfoOneMapper;
 import com.account.entity.AccountDataInfo;
 import com.account.entity.UserInfo;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: balance-of-account
@@ -38,6 +41,9 @@ public class BalanceOfAccountController {
 
     @Autowired
     private UserInfoOneMapper userInfoOneMapper;
+
+    @Autowired
+    private TradePaymentRecordMapper tradePaymentRecordMapper;
 
 
 
@@ -68,30 +74,15 @@ public class BalanceOfAccountController {
 
         System.out.println("--------------------------------------------------------------------------");
 
-        List<UserInfo> userList = userInfoOneMapper.selectAll();
-        if (userList != null) {
-            userList.forEach(System.out::println);
+        Map<String, Object> params = new HashMap<>();
+        params.put("billDate", "2018-12-24");
+        List<String> bankOrderNoList = tradePaymentRecordMapper.listBandOrderNoByColumn(params);
+        if (bankOrderNoList != null) {
+            bankOrderNoList.forEach(System.out::println);
         }
 
         return ResultData.getSuccessResult();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
