@@ -31,7 +31,6 @@
         <result column="version" jdbcType="INTEGER" property="version"/>
         <result column="edit_time" jdbcType="TIMESTAMP" property="modifyTime"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-
     </resultMap>
 
     <sql id="table_name">

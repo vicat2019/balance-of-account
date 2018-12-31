@@ -1,6 +1,7 @@
 package com.account.dao.base;
 
 import com.account.entity.AccountDataInfo;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
