@@ -147,6 +147,10 @@ public class AccountDataInfo extends BaseEntityInfo {
         }
     }
 
+    /**
+     * 从字符串中获取单号
+     * @return String
+     */
     public String getRealOrderNo() {
         if (this.orderCode.contains("-")) {
             return orderCode.substring(0, orderCode.lastIndexOf("-"));

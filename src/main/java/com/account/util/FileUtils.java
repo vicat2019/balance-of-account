@@ -25,6 +25,9 @@ public class FileUtils {
     // BUFFER大小
     private static final int BUFFER = 2048;
 
+    // 文件后缀名
+    public static final String[] FILE_EXTENSIONS = {"xlsx", "xls", "zip"};
+
     public static void main(String[] args) {
         System.out.println(unzipFile("D:\\logs\\1224.zip"));
     }
@@ -87,5 +90,61 @@ public class FileUtils {
         }
         return "";
     }
+
+
+
+    /**
+     * 是否是压缩文件
+     *
+     * @param filePath 文件路径
+     * @return
+     */
+    public static boolean isZipFile(String filePath) {
+        int index = filePath.lastIndexOf(".");
+        if (index > 0) {
+            String extension = filePath.substring(index + 1);
+            return "zip".equals(extension.trim().toLowerCase());
+        }
+
+        return false;
+    }
+
+
+    /**
+     * 是否是包含该扩展
+     *
+     * @param extension
+     * @return
+     */
+    public static boolean isContainExtension(String extension) {
+        for (String item : FILE_EXTENSIONS) {
+            if (item.equals(extension.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

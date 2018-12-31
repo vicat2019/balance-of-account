@@ -39,54 +39,36 @@ public class BalanceOfAccountServiceImpl extends BaseService<AccountDataInfoMapp
     @Autowired
     private RpTradePaymentQueryService rpTradePaymentQueryService;
 
-    // 文件后缀名
-    private final String[] FILE_EXTENSIONS = {"xlsx", "xls", "zip"};
-
-
     @Override
     public ResultData uploadDataFile(MultipartFile file, HttpServletRequest request) throws Exception {
-        // 检查文件
-        if (file == null) {
-            return ResultData.getErrResult("上传文件为空");
-        }
+        // 检查参数，文件是否为空
+        if (file == null) return ResultData.getErrResult("上传文件为空");
         String sourceFilePath = file.getOriginalFilename();
 
-        // 处理上传文件
+        // 处理上传的文件
         ResultData uploadResult = handleUploadFile(file);
         if (!uploadResult.isOk() || uploadResult.resultIsEmpty()) {
             return uploadResult;
         }
-        log.info("----------完成上传文件处理操作------------------------------------------");
 
-        // 获取文件列表
+        // 读取上传文件数据并入库
         List<File> uploadFileList = (List<File>) uploadResult.getData();
-        uploadFileList.forEach(item -> {
-            try {
-                // 解析数据
-                String filePath = item.getPath();
-                // 读取文件数据
-                List<AccountDataInfo> fileDataList = readData(filePath, sourceFilePath);
+        readAndSaveData(sourceFilePath, uploadFileList);
 
-                if (fileDataList == null || fileDataList.size() == 0) {
-                    log.error("文件[" + filePath + "]内容为空");
-                } else {
-                    // 保存到源数据表
-                    int srcCount = mapper.insertBatchToSrc(fileDataList);
-                    log.info("文件[" + filePath + "]导入数据到源数据表，个数=" + srcCount);
-                    // 将数据保存到数据库中
-                    int count = mapper.insertBatch(fileDataList);
-                    log.info("文件[" + filePath + "]添加到去重表个数=" + count);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                log.error("读取文件[" + item.getPath() + "]异常=" + e.getMessage());
-            }
-        });
-        log.info("----------完成文件数据入库操作------------------------------------------");
+        // 根据上传文件的数据进行对账
+        compareData(sourceFilePath);
 
-        // 获取数据中的交易日
+        // 返回结果
+        return ResultData.getSuccessResult();
+    }
+
+    /**
+     * 比较账单数据
+     *
+     * @param sourceFilePath 源文件路径
+     */
+    private void compareData(String sourceFilePath) {
         List<String> billDateList = mapper.getBillDateByFileName(sourceFilePath);
-
         billDateList.forEach(billDate -> {
             // 查询平台中某交易日的订单银行编号
             Map<String, Object> paramMap = new HashMap<>();
@@ -126,8 +108,38 @@ public class BalanceOfAccountServiceImpl extends BaseService<AccountDataInfoMapp
             }
         });
         log.info("----------完成对账操作--------------------------------------------------");
+    }
 
-        return ResultData.getSuccessResult();
+    /**
+     * 读取文件并保存数据
+     *
+     * @param sourceFilePath 源文件名称
+     * @param uploadFileList 上传的文件列表
+     */
+    private void readAndSaveData(String sourceFilePath, List<File> uploadFileList) {
+        uploadFileList.forEach(item -> {
+            try {
+                // 解析数据
+                String filePath = item.getPath();
+                // 读取文件数据
+                List<AccountDataInfo> fileDataList = readData(filePath, sourceFilePath);
+
+                if (fileDataList == null || fileDataList.size() == 0) {
+                    log.error("文件[" + filePath + "]内容为空");
+                } else {
+                    // 保存到源数据表
+                    int srcCount = mapper.insertBatchToSrc(fileDataList);
+                    log.info("文件[" + filePath + "]导入数据到源数据表，个数=" + srcCount);
+                    // 将数据保存到数据库中
+                    int count = mapper.insertBatch(fileDataList);
+                    log.info("文件[" + filePath + "]添加到去重表个数=" + count);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error("读取文件[" + item.getPath() + "]异常=" + e.getMessage());
+            }
+        });
+        log.info("----------完成文件数据入库操作------------------------------------------");
     }
 
     /**
@@ -197,7 +209,7 @@ public class BalanceOfAccountServiceImpl extends BaseService<AccountDataInfoMapp
         List<File> dataFileList = new ArrayList<>();
 
         // 如果是压缩包
-        if (!StringUtils.isEmpty(file.getOriginalFilename()) && isZipFile(file.getOriginalFilename())) {
+        if (!StringUtils.isEmpty(file.getOriginalFilename()) && FileUtils.isZipFile(file.getOriginalFilename())) {
             // 解压
             String unzipFolderPath = FileUtils.unzipFile(filePath);
             if (StringUtils.isEmpty(unzipFolderPath)) {
@@ -225,25 +237,11 @@ public class BalanceOfAccountServiceImpl extends BaseService<AccountDataInfoMapp
             dataFileList.add(new File(filePath));
         }
         log.info("处理后上传的文件个数=" + dataFileList.size());
+        log.info("----------完成上传文件处理操作------------------------------------------");
 
         return ResultData.getSuccessResult(dataFileList);
     }
 
-    /**
-     * 是否是压缩文件
-     *
-     * @param filePath
-     * @return
-     */
-    private boolean isZipFile(String filePath) {
-        int index = filePath.lastIndexOf(".");
-        if (index > 0) {
-            String extension = filePath.substring(index + 1);
-            return "zip".equals(extension.trim().toLowerCase());
-        }
-
-        return false;
-    }
 
     /**
      * 处理上传文件
@@ -263,7 +261,7 @@ public class BalanceOfAccountServiceImpl extends BaseService<AccountDataInfoMapp
         }
         // 检查文件类型
         String extension = originalFileName.substring(index + 1);
-        if (!isContainExtension(extension)) {
+        if (!FileUtils.isContainExtension(extension)) {
             return ResultData.getErrResult("文件类型[" + extension + "]异常");
         }
 
@@ -293,21 +291,6 @@ public class BalanceOfAccountServiceImpl extends BaseService<AccountDataInfoMapp
         ResultData<String> result = ResultData.getSuccessResult();
         result.setData(destFile.getPath());
         return result;
-    }
-
-    /**
-     * 是否是包含该扩展
-     *
-     * @param extension
-     * @return
-     */
-    private boolean isContainExtension(String extension) {
-        for (String item : FILE_EXTENSIONS) {
-            if (item.equals(extension.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
