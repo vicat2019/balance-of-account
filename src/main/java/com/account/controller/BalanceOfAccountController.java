@@ -30,10 +30,11 @@ public class BalanceOfAccountController {
     private BalanceOfAccountService balanceOfAccountService;
 
     @Autowired
-    private RpTradePaymentQueryService rpTradePaymentQueryService;
+    private AccountDataInfoMapper accountDataInfoMapper;
 
     @Autowired
-    private AccountDataInfoMapper accountDataInfoMapper;
+    private RpTradePaymentQueryService rpTradePaymentQueryService;
+
 
 
     @RequestMapping("/")
@@ -51,6 +52,38 @@ public class BalanceOfAccountController {
         }
         return ResultData.getErrResult();
     }
+
+
+    @RequestMapping("/mdb")
+    @ResponseBody
+    public ResultData testMultiDb() {
+        List<String> dataList = accountDataInfoMapper.test();
+        if (dataList!=null) {
+            dataList.forEach(System.out::println);
+        }
+
+        return ResultData.getSuccessResult();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @RequestMapping("/test")
     public String test(ModelMap modelMap) {

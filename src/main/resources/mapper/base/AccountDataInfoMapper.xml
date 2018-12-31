@@ -27,7 +27,6 @@
         <result column="remark" jdbcType="VARCHAR" property="remark"/>
         <result column="source_file_name" jdbcType="VARCHAR" property="sourceFileName"/>
 
-
         <result column="version" jdbcType="INTEGER" property="version"/>
         <result column="edit_time" jdbcType="TIMESTAMP" property="modifyTime"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
@@ -156,6 +155,10 @@
     <select id="queryByDate" resultMap="BaseResultMap">
         select <include refid="Base_Column_List"/> from <include refid="table_name"/>
         where left(accounting_time, 10)=#{accountingTime, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="test" resultType="java.lang.String">
+        select payer_name from <include refid="table_name"/> limit 100
     </select>
 
 

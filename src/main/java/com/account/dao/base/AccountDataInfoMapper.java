@@ -1,7 +1,6 @@
 package com.account.dao.base;
 
 import com.account.entity.AccountDataInfo;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +8,7 @@ import java.util.List;
 
 /**
  * @program: balance-of-account
- * @description: 账单数据项Dao
+ * @description: 账单数据项Dao  extends Mapper<AccountDataInfo>
  * @author: Vincent
  * @create: 2018-12-27 18:20
  **/
@@ -27,4 +26,7 @@ public interface AccountDataInfoMapper {
     List<AccountDataInfo> queryByDate(@Param("accountingTime") String accountingTime);
 
     List<String> getBillDateByFileName(@Param("sourceFileName") String sourceFileName);
+
+
+    List<String> test();
 }
