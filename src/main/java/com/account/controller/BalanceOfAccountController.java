@@ -1,8 +1,9 @@
 package com.account.controller;
 
 import com.account.dao.base.AccountDataInfoMapper;
-import com.account.dao.source1.UserInfoOneMapper;
+import com.account.dao.other.UserInfoOneMapper;
 import com.account.entity.AccountDataInfo;
+import com.account.entity.UserInfo;
 import com.account.entity.base.ResultData;
 import com.account.service.BalanceOfAccountService;
 import com.account.service.RpTradePaymentQueryService;
@@ -35,6 +36,9 @@ public class BalanceOfAccountController {
     @Autowired
     private RpTradePaymentQueryService rpTradePaymentQueryService;
 
+    @Autowired
+    private UserInfoOneMapper userInfoOneMapper;
+
 
 
     @RequestMapping("/")
@@ -60,6 +64,13 @@ public class BalanceOfAccountController {
         List<String> dataList = accountDataInfoMapper.test();
         if (dataList!=null) {
             dataList.forEach(System.out::println);
+        }
+
+        System.out.println("--------------------------------------------------------------------------");
+
+        List<UserInfo> userList = userInfoOneMapper.selectAll();
+        if (userList != null) {
+            userList.forEach(System.out::println);
         }
 
         return ResultData.getSuccessResult();

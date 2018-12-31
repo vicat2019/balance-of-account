@@ -2,7 +2,6 @@ package com.account.entity;
 
 import org.springframework.stereotype.Component;
 
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
